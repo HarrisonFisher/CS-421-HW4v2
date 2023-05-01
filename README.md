@@ -20,7 +20,7 @@ Use the Pthreads library to manage a shared list of integers, with mutex(es) use
   * prompt for the number of operations for each thread to do
   * then create at least two threads with work_on_list and the number of operations as the argument (the last parameter) (a pointer to the number of operations is fine, too)
   * then join to each of the threads -- this way, we don't have to wait for an arbitrary period of time to make sure the threads complete 
-* The book does cover PThreads, but you might find this link a more direct description: https://www.cs.cmu.edu/afs/cs/academic/class/15492-f07/www/pthreads.htmlLinks to an external site. (I used the join1.c example as a starting point)
+* The book does cover PThreads, but you might find this link a more direct description: https://www.cs.cmu.edu/afs/cs/academic/class/15492-f07/www/pthreads.html Links to an external site. (I used the join1.c example as a starting point)
 * For full credit, use the mutex functions to synchronize the code. To test this, you do need to do enough operations; otherwise, the first thread may easily finish all of its operations before any other thread starts executing.
 * Grading:
   * supporting the three required functions and having main() demonstrate that they work 20%
