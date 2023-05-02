@@ -30,7 +30,8 @@ Use the Pthreads library to manage a shared list of integers, with mutex(es) use
 * Here is some sample output to show unsynchronized output:
 Demo of two threads operating on the same array
 
-```How many operations do you want each thread to do on the list? 40
+```
+How many operations do you want each thread to do on the list? 40
 Thread number 42949805232: Adding 143
 Thread number 42949805232: Adding 129
 Thread number 42949805232: Adding 108
