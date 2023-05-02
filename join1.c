@@ -1,37 +1,91 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
 #define NTHREADS 10
-void *thread_function(void *);
+#define LIST_MAX_SIZE 50
+
+// Struct for array-based list.
+typedef struct list_t {
+    int size;
+    int data[LIST_MAX_SIZE];
+} list_t;
+list_t shared_list = { 0, { 0 } };
+
+void *work_on_list(void *);    
+void add_to_list(int value);
+void print_list();
+
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 int  counter = 0;
 
-main()
-{
-   pthread_t thread_id[NTHREADS];
-   int i, j;
 
-   for(i=0; i < NTHREADS; i++)
-   {
-      pthread_create( &thread_id[i], NULL, thread_function, NULL );
-   }
+main() {
+    
+    // Seed the random number generator with the current time
+    srand(time(NULL)); 
 
-   for(j=0; j < NTHREADS; j++)
-   {
-      pthread_join( thread_id[j], NULL); 
-   }
-  
-   /* Now that all threads are complete I can print the final result.     */
-   /* Without the join I could be printing a value before all the threads */
-   /* have been completed.                                                */
+    pthread_t threads[NTHREADS];
+    int num_ops;
 
-   printf("Final counter value: %d\n", counter);
+    // Prompt for the number of operations to do.
+    printf("How many operations do you want each thread to do on the list? ");
+    scanf("%d", &num_ops);
+
+
+    // Create the threads.
+    pthread_mutex_lock(&mutex1); 
+    for (int i = 0; i < NTHREADS; i++) {
+        pthread_create(&threads[i], NULL, work_on_list, &num_ops);
+    }
+    pthread_mutex_unlock(&mutex1);
+
+
+    // Wait for the threads to finish.
+    for (int i = 0; i < NTHREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    printf("The end\n");
+    return 0;
 }
 
-void *thread_function(void *dummyPtr)
-{
-   printf("Thread number %ld\n", pthread_self());
-   pthread_mutex_lock( &mutex1 );
-   counter++;
-   pthread_mutex_unlock( &mutex1 );
+// Perform a number of random operations on the shared list.
+void *work_on_list(void *dummyPtr) {
+    int num_ops = *(int *)dummyPtr;
+    for (int i = 0; i < num_ops; i++) {
+        // Randomly choose to add a value between 0-99 or print the list.
+        if (rand() % 3 == 0) {
+            int value = rand() % 100;
+             add_to_list(value);
+        } else {
+            print_list();
+        }
+    }
 }
+
+
+// Will add a value to the end of the array if it fits.
+void add_to_list(int value) {
+    if (shared_list.size >= LIST_MAX_SIZE) {
+        printf("Thread number %ld: ", pthread_self());
+        printf("List is full\n");
+        return;
+    }
+    shared_list.data[shared_list.size] = value;
+    shared_list.size++;
+    printf("Thread number %ld: ", pthread_self());
+    printf("Adding %d\n", value);
+}
+
+
+// Will display the values separated by spaces on a line
+void print_list() {
+    // printf("List contents: ");
+    printf("Thread number %ld: ", pthread_self());
+    for (int i = 0; i < shared_list.size; i++) {
+        printf("%d ", shared_list.data[i]);
+    }
+    printf("\n");
+}
+
